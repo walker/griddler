@@ -157,6 +157,7 @@ describe Griddler::Email do
 
       > Hey!
     EOF
+
     charsets = {
       to: 'UTF-8',
       html: 'utf-8',
@@ -209,6 +210,95 @@ describe Griddler::Email do
       email = Griddler::Email.new(to: "fake@example.com <#{@address}>", from: "fake@example.com <#{@address}>")
       email.to.should == @address
       email.to.should == @address
+    end
+  end
+
+  describe 'with custom configuration' do
+    let(:params) do
+      {
+        to: 'some-identifier@thisapp.com',
+        from: 'Joe User <joeuser@example.com>',
+        subject: 'Re: [ThisApp] That thing',
+        text: <<-EOS.strip_heredoc.strip
+          lololololo hi
+
+          Reply ABOVE THIS LINE
+
+          hey sup
+        EOS
+      }
+    end
+
+    before do
+      Griddler.configure {}
+    end
+
+    describe 'raw_body = true' do
+      it 'should not modify the body' do
+        config.stub(raw_body: true)
+        email = Griddler::Email.new(params)
+
+        email.body.should == params[:text]
+      end
+    end
+
+    describe 'reply_delimiter = "Stuff and things"' do
+      it 'should not split on Reply ABOVE THIS LINE' do
+        Griddler.configuration.stub(reply_delimiter: 'Stuff and things')
+        email = Griddler::Email.new(params)
+
+        email.body.should == params[:text]
+      end
+    end
+
+    describe 'to = :hash' do
+      it 'returns a hash for email.to' do
+        pending 'needs hash built and tested explicitly'
+
+        Griddler.configuration.stub(to: :hash)
+        email = Griddler::Email.new(params)
+
+        email.to.should be_an_instance_of(Hash)
+      end
+    end
+
+    describe 'to = :full' do
+      it 'returns the full to for email.to' do
+        config.stub(to: :full)
+        email = Griddler::Email.new(params)
+
+        email.to.should == params[:to]
+      end
+    end
+
+    describe 'to = :email' do
+      it 'returns just the email address for email.to' do
+        config.stub(to: :email)
+        email = Griddler::Email.new(params)
+
+        email.to.should == 'joeuser@example.com'
+      end
+    end
+
+    describe 'to = :token' do
+      it 'returns the local portion of the email for email.to' do
+        config.stub(to: :token)
+        email = Griddler::Email.new(params)
+
+        email.to.should == 'joeuser'
+      end
+    end
+
+    describe 'handler_class' do
+      it 'calls process on the handler class' do
+        pending
+      end
+    end
+
+    describe 'handler_method' do
+    end
+
+    describe 'raw_body' do
     end
   end
 end

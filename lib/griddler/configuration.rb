@@ -1,5 +1,7 @@
 module Griddler
-  mattr_accessor :configuration
+  class << self
+    attr_accessor :configuration
+  end
 
   def self.configure
     self.configuration = Configuration.new
@@ -22,7 +24,7 @@ module Griddler
     end
 
     def reply_delimiter
-      @raw_body ||= 'REPLY ABOVE THIS LINE'
+      @reply_delimiter ||= 'Reply ABOVE THIS LINE'
     end
   end
 end
