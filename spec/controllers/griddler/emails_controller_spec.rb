@@ -9,8 +9,10 @@ describe Griddler::EmailsController do
 
     it 'creates a new Griddler::Email' do
         controller.stub(:params).and_return({})
-        Griddler::Email.stub(:new).and_return('something')
+        email = double(process: 'something')
+        Griddler::Email.stub(:new).and_return(email)
         Griddler::Email.should_receive(:new).with({})
+        email.should_receive(:process)
 
         post :create
     end
