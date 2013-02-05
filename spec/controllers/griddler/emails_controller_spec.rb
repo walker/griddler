@@ -9,11 +9,9 @@ describe Griddler::EmailsController do
     end
 
     it 'creates a new Griddler::Email' do
-      controller.stub(:params).and_return({})
-      email = double(process: 'something')
-      Griddler::Email.stub(:new).and_return(email)
-      Griddler::Email.should_receive(:new).with({})
+      email = double('Griddler::Email instance')
       email.should_receive(:process)
+      Griddler::Email.should_receive(:new).and_return(email)
 
       post :create
     end
